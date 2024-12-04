@@ -26,7 +26,8 @@ namespace TodoAppMT.Controllers
         // GET: Todos
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Todos.Where(t => t.IdentityUserId == _userManager.GetUserId(User)).ToListAsync());
+            return View(await _context.Todos.
+                Where(t => t.IdentityUserId == _userManager.GetUserId(User)).ToListAsync());
         }
 
         // GET: Todos/Details/5
@@ -37,8 +38,9 @@ namespace TodoAppMT.Controllers
                 return NotFound();
             }
 
-            var todo = await _context.Todos
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var todo = await _context.Todos.
+                Where(t => t.IdentityUserId == _userManager.GetUserId(User)).
+                FirstOrDefaultAsync(m => m.Id == id);
             if (todo == null)
             {
                 return NotFound();
@@ -78,7 +80,9 @@ namespace TodoAppMT.Controllers
                 return NotFound();
             }
 
-            var todo = await _context.Todos.FindAsync(id);
+            var todo = await _context.Todos.
+                Where(t => t.IdentityUserId == _userManager.GetUserId(User)).
+                FirstOrDefaultAsync(m => m.Id == id);
             if (todo == null)
             {
                 return NotFound();
@@ -91,13 +95,14 @@ namespace TodoAppMT.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,IdentityUserId,Title,IsCompleted")] Todo todo)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,IsCompleted")] Todo todo)
         {
             if (id != todo.Id)
             {
                 return NotFound();
             }
 
+            todo.IdentityUserId = _userManager.GetUserId(User);
             if (ModelState.IsValid)
             {
                 try
@@ -129,8 +134,9 @@ namespace TodoAppMT.Controllers
                 return NotFound();
             }
 
-            var todo = await _context.Todos
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var todo = await _context.Todos.
+                Where(t => t.IdentityUserId == _userManager.GetUserId(User)).
+                FirstOrDefaultAsync(m => m.Id == id);
             if (todo == null)
             {
                 return NotFound();
@@ -144,7 +150,9 @@ namespace TodoAppMT.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var todo = await _context.Todos.FindAsync(id);
+            var todo = await _context.Todos.
+                Where(t => t.IdentityUserId == _userManager.GetUserId(User)).
+                FirstOrDefaultAsync(m => m.Id == id);
             if (todo != null)
             {
                 _context.Todos.Remove(todo);
@@ -156,7 +164,9 @@ namespace TodoAppMT.Controllers
 
         private bool TodoExists(int id)
         {
-            return _context.Todos.Any(e => e.Id == id);
+            return _context.Todos.
+                Where(t => t.IdentityUserId == _userManager.GetUserId(User)).
+                Any(e => e.Id == id);
         }
     }
 }
